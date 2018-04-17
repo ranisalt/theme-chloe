@@ -7,6 +7,13 @@ function _is_git_dirty
   echo (command git status -s --ignore-submodules=dirty ^/dev/null)
 end
 
+function _pretty_cwd -S -a cwd
+  set -l bold (set_color -o)
+  set -l normal (set_color normal)
+
+  echo -n -s "$cwd" | sed 's|[^/]*$|'$bold'&'$normal'|'
+end
+
 function fish_prompt
   set -l blue (set_color blue)
   set -l green (set_color green)
@@ -29,7 +36,7 @@ function fish_prompt
   if test "$theme_short_path" = 'yes'
     set cwd $blue(basename (prompt_pwd))
   else
-    set cwd $blue(prompt_pwd)
+    set cwd $blue(_pretty_cwd (prompt_pwd))
   end
 
   if [ (_git_branch_name) ]
