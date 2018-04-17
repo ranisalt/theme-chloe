@@ -12,7 +12,18 @@ function fish_prompt
   set -l green (set_color green)
   set -l normal (set_color normal)
 
-  set -l arrow "λ"
+  set -q theme_arrow
+    or set -l theme_arrow "lambda"
+
+  set -l arrow
+  switch "$theme_arrow"
+    case "fish"
+      set arrow "⋊>"
+    case "lambda"
+      set arrow "λ"
+    case "*"
+      set arrow "$theme_arrow"
+  end
 
   set -l cwd
   if test "$theme_short_path" = 'yes'
