@@ -13,7 +13,13 @@ function fish_prompt
   set -l normal (set_color normal)
 
   set -l arrow "λ"
-  set -l cwd $blue(basename (prompt_pwd))
+
+  set -l cwd
+  if test "$theme_short_path" = 'yes'
+    set cwd $blue(basename (prompt_pwd))
+  else
+    set cwd $blue(prompt_pwd)
+  end
 
   if [ (_git_branch_name) ]
     set git_info $green(_git_branch_name)
