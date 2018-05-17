@@ -20,17 +20,7 @@ function fish_prompt
   set -l normal (set_color normal)
 
   set -q theme_arrow
-    or set -l theme_arrow "lambda"
-
-  set -l arrow
-  switch "$theme_arrow"
-    case "fish"
-      set arrow "⋊>"
-    case "lambda"
-      set arrow "λ"
-    case "*"
-      set arrow "$theme_arrow"
-  end
+    or set -l theme_arrow "λ"
 
   set -l cwd
   if test "$theme_short_path" = 'yes'
@@ -49,5 +39,5 @@ function fish_prompt
     end
   end
 
-  echo -n -s $cwd $git_info $normal ' ' $arrow ' '
+  echo -n -s $cwd $git_info $normal ' ' $theme_arrow ' '
 end
