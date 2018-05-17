@@ -41,3 +41,5 @@ function fish_prompt
 
   echo -n -s $cwd $git_info $normal ' ' $theme_arrow ' '
 end
+
+# vim: et:ts=2:sw=2

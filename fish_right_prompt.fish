@@ -35,3 +35,5 @@ function fish_right_prompt
     end
   end
 end
+
+# vim: et:ts=2:sw=2
