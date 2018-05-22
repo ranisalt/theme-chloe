@@ -31,6 +31,9 @@ function fish_prompt
   set -q theme_arrow
     or set -l theme_arrow "λ"
 
+  set -q theme_separator
+    or set -l theme_separator " "
+
   set -l cwd
   if test "$theme_short_path" = 'yes'
     set cwd $blue(basename (prompt_pwd))
@@ -41,13 +44,13 @@ function fish_prompt
   set -l venv_info
   if [ (_python_venv_name) ]
     set venv_info $brblue(_python_venv_name)
-    set venv_info "$venv_info "
+    set venv_info "$venv_info$normal$theme_separator"
   end
 
   set -l git_info
   if [ (_git_branch_name) ]
     set git_info $green(_git_branch_name)
-    set git_info ":$git_info"
+    set git_info "$normal$theme_separator$git_info"
 
     if [ (_is_git_dirty) ]
       set -l dirty "*"
@@ -55,7 +58,7 @@ function fish_prompt
     end
   end
 
-  echo -n -s $venv_info $cwd $git_info $normal ' ' $theme_arrow ' '
+  echo -n -s $venv_info $cwd $git_info $normal $theme_separator $theme_arrow ' '
 end
 
 # vim: et:ts=2:sw=2
