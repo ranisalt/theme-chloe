@@ -1,39 +1,50 @@
 # To show the right prompt please set
-# set theme_display_rbenv 'yes' (config.fish)
-# set theme_display_rbenv_gemset 'yes' (config.fish)
-# set theme_display_rbenv_with_gemfile_only 'yes' (config.fish)
+# set theme_display_pyenv 'yes' (config.fish)
 
-function _ruby_version
-  echo (command rbenv version-name | sed 's/\n//')
+function _python_version
+  set -q theme_display_timestamp
+    or set -l theme_display_timestamp 'yes'
+  if [ "$theme_display_pyenv" != 'yes' ]
+    return
+  end
+
+  set -l version
+  if set -q VIRTUAL_ENV
+    set -l _venv (basename (dirname "$VIRTUAL_ENV"))
+    set -l _version (command python --version | awk '{print $2}')
+    set version "$_version ($_venv)"
+  else
+    set version (command pyenv version-name)
+    if [ "$version" = "system" ]
+      return
+    end
+  end
+
+  echo -n '' $version
 end
 
-function _ruby_gemset
-  echo (command rbenv gemset active ^/dev/null | sed -e 's| global||')
+function _timestamp
+  set -q theme_display_timestamp
+    or set -l theme_display_timestamp 'yes'
+  if [ "$theme_display_timestamp" != 'yes' ]
+    return
+  end
+
+  set -q theme_date_format
+    or set -l theme_date_format '+%R'
+
+  date "$theme_date_format"
 end
 
 function fish_right_prompt
-  if [ "$theme_display_rbenv" = 'yes' ]
-    set -l red (set_color red)
-    set -l normal (set_color normal)
-    set ruby_info $red(_ruby_version)
+  set -l yellow (set_color yellow)
+  set -l shadow (set_color $fish_color_comment)
 
-    if [ "$theme_display_rbenv_gemset" = 'yes' ]
-      if [ (_ruby_gemset) ]
-        set -l ruby_gemset $red(_ruby_gemset)
-        set ruby_info "$ruby_info@$ruby_gemset"
-      end
-    end
+  set python_info $yellow(_python_version)
+  set timestamp $shadow(_timestamp)
 
-    if [ "$theme_display_rbenv_with_gemfile_only" = 'yes' ]
-      if test -f Gemfile
-        echo -n -s $ruby_info $normal
-      else
-        echo -n -s $normal
-      end
-    else
-      echo -n -s $ruby_info $normal
-    end
-  end
+  echo -n $python_info $timestamp
+  set_color normal
 end
 
 # vim: et:ts=2:sw=2

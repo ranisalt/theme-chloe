@@ -14,14 +14,6 @@ function _pretty_cwd -S -a cwd
   echo -n -s "$cwd" | sed 's|[^/]*$|'$bold'&'$normal'|'
 end
 
-function _python_venv_name -S -a cwd
-  if test -z "$VIRTUAL_ENV"
-    return
-  end
-
-  echo -n '' (basename "$VIRTUAL_ENV")
-end
-
 function fish_prompt
   set -l blue (set_color blue)
   set -l brblue (set_color brblue)
@@ -41,12 +33,6 @@ function fish_prompt
     set cwd $blue(_pretty_cwd (prompt_pwd))
   end
 
-  set -l venv_info
-  if [ (_python_venv_name) ]
-    set venv_info $brblue(_python_venv_name)
-    set venv_info "$venv_info$normal$theme_separator"
-  end
-
   set -l git_info
   if [ (_git_branch_name) ]
     set git_info $green(_git_branch_name)
@@ -58,7 +44,7 @@ function fish_prompt
     end
   end
 
-  echo -n -s $venv_info $cwd $git_info $normal $theme_separator $theme_arrow ' '
+  echo -n -s $cwd $git_info $normal $theme_separator $theme_arrow ' '
 end
 
 # vim: et:ts=2:sw=2
