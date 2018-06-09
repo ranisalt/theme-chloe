@@ -1,17 +1,43 @@
 # name: trixie
-function _git_branch_name
-  echo (command git symbolic-ref HEAD ^/dev/null | sed -e 's|^refs/heads/||')
+
+function _git_dirty
+  set -q theme_dirty_symbol
+    or set -l theme_dirty_symbol '±'
+
+  set -l dirty (command git status -s --ignore-submodules=dirty ^/dev/null)
+  if [ -n "$dirty" ]
+   echo -n "$theme_dirty_symbol"
+  end
 end
 
-function _is_git_dirty
-  echo (command git status -s --ignore-submodules=dirty ^/dev/null)
+function _git_ref
+  set -q theme_branch_symbol
+    or set -l theme_branch_symbol \uE0A0
+
+  set -q theme_detached_symbol
+    or set -l theme_detached_symbol '➦'
+
+  set -l ref (command git symbolic-ref HEAD ^/dev/null)
+  if [ $status -gt 0 ]
+    set -l branch (command git show-ref --head -s --abbrev | head -n1 ^/dev/null)
+    echo -ns $theme_detached_symbol $branch
+  else
+    set -l branch (string sub -s 12 -- "$ref")
+    echo -ns $theme_branch_symbol $branch
+  end
 end
 
-function _pretty_cwd -S -a cwd
+function prompt_git
+  if command git rev-parse --is-inside-work-tree >/dev/null ^/dev/null
+    echo -ns (_git_ref) (_git_dirty)
+  end
+end
+
+function prompt_cwd -S -a cwd
   set -l bold (set_color -o)
   set -l normal (set_color normal)
 
-  echo -n -s "$cwd" | sed 's|[^/]*$|'$bold'&'$normal'|'
+  echo -ns $cwd | sed 's|[^/]*$|'$bold'&'$normal'|'
 end
 
 function fish_prompt
@@ -25,26 +51,22 @@ function fish_prompt
 
   set -q theme_separator
     or set -l theme_separator " "
+  set sep "$normal$theme_separator"
 
-  set -l cwd
+  set -l prompt
+
   if test "$theme_short_path" = 'yes'
-    set cwd $blue(basename (prompt_pwd))
+    set prompt $blue(basename (prompt_pwd))
   else
-    set cwd $blue(_pretty_cwd (prompt_pwd))
+    set prompt $blue(prompt_cwd (prompt_pwd))
   end
 
-  set -l git_info
-  if [ (_git_branch_name) ]
-    set git_info $green(_git_branch_name)
-    set git_info "$normal$theme_separator$git_info"
-
-    if [ (_is_git_dirty) ]
-      set -l dirty "*"
-      set git_info "$git_info$dirty"
-    end
+  set -l git_info (prompt_git)
+  if [ -n "$git_info" ]
+    set prompt "$prompt$sep$green$git_info$normal"
   end
 
-  echo -n -s $cwd $git_info $normal $theme_separator $theme_arrow ' '
+  echo -ns $prompt $sep $theme_arrow ' '
 end
 
 # vim: et:ts=2:sw=2
