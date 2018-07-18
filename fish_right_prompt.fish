@@ -8,6 +8,11 @@ function _python_version
     return
   end
 
+  set -l dummy (type pyenv ^/dev/null)
+  if [ $status -gt 0 ]
+    return
+  end
+
   set -l version
   if set -q VIRTUAL_ENV
     set -l _venv (basename (dirname "$VIRTUAL_ENV"))
